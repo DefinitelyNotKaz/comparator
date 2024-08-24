@@ -34,3 +34,15 @@ Comparator is a tool designed to identify pixels that do not match a [pxls.space
    ```bash
    go build
    ```
+
+## Usage
+
+To use Comparator, follow these steps:
+   ```bash
+   comparator -i image.png -p palette.json
+   ```
+   Replace `image.png` with the path to your image and `palette.json` with the path to pxls palette.
+
+If you want to display what pixels are wrong on the console add `--verbose`.
+
+You can see the options with `comparator --help`
