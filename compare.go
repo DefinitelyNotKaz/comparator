@@ -64,7 +64,7 @@ func Compare(options Options) error {
 			pixelColor := ConvertToRGBA(img.At(x, y))
 
 			if !ColorInPalette(pixelColor, colors) {
-				if verbose {
+				if options.Verbose {
 					fmt.Printf("Pixel at (%d, %d) is not in the palette\n", x, y)
 				}
 				diff.SetRGBA(x, y, color.RGBA{255, 0, 0, 255})

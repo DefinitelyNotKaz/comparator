@@ -7,10 +7,6 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var file string
-var template string
-var verbose bool
-
 type Options struct {
 	File    string
 	Palette string
