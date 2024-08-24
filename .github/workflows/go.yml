@@ -36,6 +36,7 @@ jobs:
         env:
           GOOS: ${{ matrix.platform }}
           GOARCH: ${{ matrix.arch }}
+          CGO_ENABLED: 0
         run: |
           go build -v -o build/${{ matrix.name }} ./...
       - name: Upload artifacts
