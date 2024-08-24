@@ -51,26 +51,37 @@ jobs:
         path: build/${{ matrix.name }}
 
   release:
-    needs: build
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v4
+  needs: build
+  runs-on: ubuntu-latest
+  steps:
+  - uses: actions/checkout@v4
 
-    - name: Download all artifacts
-      uses: actions/download-artifact@v3
-      with:
-        path: artifacts
+  - name: Download all artifacts
+    uses: actions/download-artifact@v3
+    with:
+      path: artifacts
 
-    - name: Create Release
-      id: create_release
-      uses: actions/create-release@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        tag_name: ${{ github.ref }}
-        release_name: Release ${{ github.ref }}
-        draft: false
-        prerelease: false
+  - name: Get the version
+    id: get_version
+    run: echo ::set-output name=VERSION::${GITHUB_REF#refs/tags/}
+
+  - name: Create Release
+    id: create_release
+    uses: actions/create-release@v1
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    with:
+      tag_name: ${{ steps.get_version.outputs.VERSION }}
+      release_name: Release ${{ steps.get_version.outputs.VERSION }}
+      draft: false
+      prerelease: false
+
+  - name: Upload Release Assets
+    uses: softprops/action-gh-release@v1
+    with:
+      files: artifacts/**/*
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
     - name: Upload Release Assets
       uses: actions/upload-release-asset@v1
