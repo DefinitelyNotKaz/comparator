@@ -26,37 +26,49 @@ jobs:
           - platform: windows
             arch: amd64
             name: windows-amd64
+
     steps:
       - uses: actions/checkout@v4
+
       - name: Set up Go
         uses: actions/setup-go@v4
         with:
-          go-version: '1.23'
+          go-version: '1.22'
+
       - name: Build
         env:
           GOOS: ${{ matrix.platform }}
           GOARCH: ${{ matrix.arch }}
           CGO_ENABLED: 0
         run: |
-          go build -v -o build/${{ matrix.name }} ./...
+          EXT=""
+          if [ "${{ matrix.platform }}" = "windows" ]; then
+            EXT=".exe"
+          fi
+          BINARY_NAME="comparator-${{ matrix.platform }}-${{ matrix.arch }}$EXT"
+          go build -v -o "build/$BINARY_NAME" ./...
+
       - name: Upload artifacts
         uses: actions/upload-artifact@v3
         with:
           name: ${{ matrix.name }}
-          path: build/${{ matrix.name }}
+          path: build/comparator-${{ matrix.platform }}-${{ matrix.arch }}*
 
   release:
     needs: build
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
       - name: Download all artifacts
         uses: actions/download-artifact@v3
         with:
           path: artifacts
+
       - name: Get the version
         id: get_version
         run: echo ::set-output name=VERSION::${GITHUB_REF#refs/tags/}
+
       - name: Create Release
         id: create_release
         uses: actions/create-release@v1
@@ -67,6 +79,7 @@ jobs:
           release_name: Release ${{ steps.get_version.outputs.VERSION }}
           draft: false
           prerelease: false
+
       - name: Upload Release Assets
         uses: softprops/action-gh-release@v1
         with:
